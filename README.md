@@ -72,7 +72,7 @@ chmod +x App.sh
 0. Keluar
 
 # 🔧 Penjelasan Fungsi Utama
-1. add_data()
+### 1. add_data()
 
 Meminta input nama
 
@@ -84,13 +84,13 @@ Menaikkan ID otomatis
 
 Menampilkan pesan sukses
 
-2. view_data()
+### 2. view_data()
 
 Menampilkan seluruh data dalam array
 
 Menolak jika belum ada data
 
-3. edit_data()
+### 3. edit_data()
 
 Meminta input ID
 
@@ -98,7 +98,7 @@ Mencari ID dalam array
 
 Mengubah nama jika ditemukan
 
-4. delete_data()
+### 4. delete_data()
 
 Meminta input ID
 
@@ -106,26 +106,26 @@ Menghapus data pada index tersebut
 
 Reindex array agar tidak bolong
 
-5. show_menu()
+### 5. show_menu()
 
 Menampilkan menu interaktif
 
-📊 Contoh Output Program
-Tambah Data
+# 📊 Contoh Output Program
+## Tambah Data
 Masukkan Nama: Ronal
 Data berhasil ditambahkan! (ID = 1)
 
-Lihat Data
+## Lihat Data
 DAFTAR DATA:
 ID: 1 | Nama: Ronal
 ID: 2 | Nama: Dennis
 
-Edit Data
+## Edit Data
 Masukkan ID yang ingin diedit: 1
 Masukkan Nama baru: Ronaldo
 Data berhasil diperbarui!
 
-Hapus Data
+## Hapus Data
 Masukkan ID yang ingin dihapus: 2
 Data berhasil dihapus!
 
