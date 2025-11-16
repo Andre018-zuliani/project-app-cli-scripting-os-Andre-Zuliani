@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # ANSI ESCAPE CODE (WARNA)
-# Digunakan untuk mempercantik output CLI
 RED="\033[1;31m"
 GREEN="\033[1;32m"
 YELLOW="\033[1;33m"
@@ -9,11 +8,13 @@ CYAN="\033[1;36m"
 RESET="\033[0m"
 
 # ARRAY (Struktur Data)
-# Menyimpan daftar ID dan nama sebagai data dinamis
 data_ids=()
 data_names=()
 
-# FUNCTION: Menampilkan Menu (tanpa parameter)
+# ID OTOMATIS DIMULAI DARI 1
+current_id=1
+
+# TAMPILKAN MENU
 show_menu() {
     echo -e "${CYAN}"
     echo "=============================="
@@ -28,73 +29,32 @@ show_menu() {
     echo ""
 }
 
-# FUNCTION Dengan Parameter
-# Menampilkan pesan sukses dengan warna
-success_msg() {
-    echo -e "${GREEN}$1${RESET}"
-}
+# PESAN SEDERHANA
+success_msg() { echo -e "${GREEN}$1${RESET}"; }
+error_msg()   { echo -e "${RED}$1${RESET}"; }
 
-# FUNCTION Dengan Parameter
-# Menampilkan pesan error
-error_msg() {
-    echo -e "${RED}$1${RESET}"
-}
-
-# VALIDASI ID (HARUS ANGKA)
-# Operator perbandingan digunakan disini
-valid_number() {
-    if ! [[ "$1" =~ ^[0-9]+$ ]]; then
-        error_msg "ID harus berupa angka!"
-        return 1
-    fi
-    return 0
-}
-
-# CEK DUPLIKASI ID
-is_duplicate_id() {
-    for id in "${data_ids[@]}"; do
-        if [[ "$id" == "$1" ]]; then
-            error_msg "ID sudah digunakan!"
-            return 1
-        fi
-    done
-    return 0
-}
-
-# FUNGSI TAMBAH DATA
-# - Input: ID & Nama
-# - Validasi: Tidak kosong, ID harus angka, tidak duplikat
-# - Menggunakan Array untuk menyimpan data
+# TAMBAH DATA (ID OTOMATIS)
 add_data() {
-    read -p "Masukkan ID: " id
-
-    # VALIDASI INPUT KOSONG
-    if [[ -z "$id" ]]; then
-        error_msg "ID tidak boleh kosong!"
-        return
-    fi
-
-    # VALIDASI ID ANGKA
-    valid_number "$id" || return
-
-    # CEK DUPLIKASI
-    is_duplicate_id "$id" || return
-
     read -p "Masukkan Nama: " name
+
+    # Validasi nama
     if [[ -z "$name" ]]; then
         error_msg "Nama tidak boleh kosong!"
         return
     fi
 
-    # MENAMBAHKAN KE ARRAY
-    data_ids+=("$id")
+    # Tambahkan data ke array
+    data_ids+=("$current_id")
     data_names+=("$name")
 
-    success_msg "Data berhasil ditambahkan!"
+    # Tampilkan pesan sukses
+    success_msg "Data berhasil ditambahkan! (ID = $current_id)"
+
+    # Naikkan ID otomatis
+    current_id=$((current_id + 1))
 }
 
-# FUNCTION MELIHAT DATA
-# Loop digunakan untuk menampilkan semua data
+# LIHAT DATA
 view_data() {
     echo -e "${YELLOW}=== DAFTAR DATA ===${RESET}"
 
@@ -108,12 +68,15 @@ view_data() {
     done
 }
 
-# FUNCTION EDIT DATA
-# Operator perbandingan digunakan untuk mencari ID
+# EDIT DATA
 edit_data() {
     read -p "Masukkan ID yang ingin diedit: " id
 
-    valid_number "$id" || return
+    # Validasi ID harus angka
+    if ! [[ "$id" =~ ^[0-9]+$ ]]; then
+        error_msg "ID harus berupa angka!"
+        return
+    fi
 
     found=0
 
@@ -121,10 +84,12 @@ edit_data() {
         if [[ "${data_ids[$i]}" == "$id" ]]; then
             found=1
             read -p "Masukkan Nama baru: " new_name
+
             if [[ -z "$new_name" ]]; then
-                error_msg "Nama baru tidak boleh kosong!"
+                error_msg "Nama tidak boleh kosong!"
                 return
             fi
+
             data_names[$i]="$new_name"
             success_msg "Data berhasil diperbarui!"
             break
@@ -132,26 +97,30 @@ edit_data() {
     done
 
     if [[ $found -eq 0 ]]; then
-        error_msg "Data tidak ditemukan!"
+        error_msg "ID tidak ditemukan!"
     fi
 }
 
-# FUNCTION HAPUS DATA
-# Menggunakan unset untuk menghapus elemen array
+# HAPUS DATA
 delete_data() {
     read -p "Masukkan ID yang ingin dihapus: " id
 
-    valid_number "$id" || return
+    # Validasi ID harus angka
+    if ! [[ "$id" =~ ^[0-9]+$ ]]; then
+        error_msg "ID harus berupa angka!"
+        return
+    fi
 
     found=0
 
     for ((i=0; i<${#data_ids[@]}; i++)); do
         if [[ "${data_ids[$i]}" == "$id" ]]; then
             found=1
+
             unset 'data_ids[i]'
             unset 'data_names[i]'
 
-            # Reindex array agar tidak bolong
+            # Reindex array
             data_ids=("${data_ids[@]}")
             data_names=("${data_names[@]}")
 
@@ -165,13 +134,11 @@ delete_data() {
     fi
 }
 
-# LOOP UTAMA (Perulangan)
-# Program berjalan terus hingga user memilih keluar
+# LOOP UTAMA
 while true; do
     show_menu
     read -p "Pilih menu: " choice
 
-    # KONDISI - CASE
     case $choice in
         1) add_data ;;
         2) view_data ;;
